@@ -32,12 +32,11 @@ class MaxWorker(multiprocessing.Process):
             self.logger.error("Topology initial load failed")
         self.__max_cube_connection = None
 
-        # TODO move config values to external file
-
-        self.cube_ip_adress = '172.22.0.10'
-        self.topology_refresh_period = 60
-        self.mqtt_update_period = 300
-        self.cube_duty_cycle_reset_interval = 3600
+        self.cube_ip_adress = config['max_cube_ip_adress']
+        self.topology_refresh_period = config['max_topology_refresh_period']
+        self.mqtt_update_period = config['max_mqtt_update_period']
+        self.cube_duty_cycle_reset_interval = config['max_cube_duty_cycle_reset_interval']
+        self.enable_sanity_check = config['max_perform_sanity_check']
 
         self.topology_last_refresh = 0
         self.mqtt_last_refresh = 0
@@ -54,6 +53,7 @@ class MaxWorker(multiprocessing.Process):
         try:
             self.connect()
             cube = MaxCube(self.__max_cube_connection)
+            #TODO report cube values to the broker
             # self.__messageQ.put(self.prepare_output('cube', 'free_mem_slots', cube.free_mem_slots))
             # self.__messageQ.put(self.prepare_output('cube', 'duty_cycle', cube.duty_cycle))
             for device in cube.devices:
@@ -77,9 +77,10 @@ class MaxWorker(multiprocessing.Process):
                     self.update_device(device, 'target_temperature')
                     self.update_device(device, 'valve_position')
 
-                    # TODO dopisac ogranicznik na duty cycle
                     if update_mqtt:
-                        if (device_id in self.desired_temperatures) \
+                        # TODO put restriction on duty_cycle (if more than threshold, do not perform sanity check
+                        if self.enable_sanity_check \
+                                and (device_id in self.desired_temperatures) \
                                 and (self.desired_temperatures[device_id] != device.target_temperature):
                             try:
                                 self.logger.info("Correcting temperature for device :%s (%s/%s) from:%s to:%s" % (

@@ -14,10 +14,10 @@ class MQTTClient(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         self.messageQ = messageQ
         self.commandQ = commandQ
-        # TODO move config values to external file
-        self.mqttDataPrefix = '/data/MaxCube'
-        self.mqtt_host = 'malinka.home'
-        self.mqtt_port = 1883
+
+        self.mqttDataPrefix = config['mqtt_prefix']
+        self.mqtt_host = config['mqtt_host']
+        self.mqtt_port = config['mqtt_port']
         self._mqttConn = mqtt.Client(client_id='Max!-MQTT'
                                                '', clean_session=True, userdata=None)
 
@@ -26,7 +26,7 @@ class MQTTClient(multiprocessing.Process):
         self._mqttConn.on_publish = self._on_publish
         self._mqttConn.on_message = self._on_message
 
-        self.message_timeout = 60
+        self.message_timeout = config['mqtt_message_timeout']
 
     def close(self):
         self.logger.info("Closing connection")

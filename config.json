@@ -6,5 +6,6 @@
   "max_cube_ip_adress": "172.22.0.10",
   "max_topology_refresh_period": 60,
   "max_mqtt_update_period": 300,
-  "max_cube_duty_cycle_reset_interval": 3600
+  "max_cube_duty_cycle_reset_interval": 3600,
+  "max_perform_sanity_check" : true
 }

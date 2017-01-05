@@ -1,0 +1,11 @@
+{
+  "mqtt_host": "malinka.home",
+  "mqtt_port": 1883,
+  "mqtt_prefix": "/data/MaxCube",
+  "mqtt_message_timeout": 60,
+  "max_cube_ip_adress": "172.22.0.10",
+  "max_topology_refresh_interval": 60,
+  "max_mqtt_update_interval": 300,
+  "max_cube_duty_cycle_reset_interval": 3600,
+  "max_perform_sanity_check" : true
+}

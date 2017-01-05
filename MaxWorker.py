@@ -33,8 +33,8 @@ class MaxWorker(multiprocessing.Process):
         self.__max_cube_connection = None
 
         self.cube_ip_adress = config['max_cube_ip_adress']
-        self.topology_refresh_period = config['max_topology_refresh_period']
-        self.mqtt_update_period = config['max_mqtt_update_period']
+        self.topology_refresh_period = config['max_topology_refresh_interval']
+        self.mqtt_update_period = config['max_mqtt_update_interval']
         self.cube_duty_cycle_reset_interval = config['max_cube_duty_cycle_reset_interval']
         self.enable_sanity_check = config['max_perform_sanity_check']
 

@@ -170,6 +170,8 @@ class MaxWorker(multiprocessing.Process):
             if time.time() > (self.cube_duty_cycle_reset + self.cube_duty_cycle_reset_interval):
                 self.cube_duty_cycle = 0
                 self.cube_duty_cycle_reset = time.time()
+                self.__messageQ.put(self.prepare_output(
+                    'cube', 'duty_cycle', self.cube_duty_cycle))
 
             if not self.__commandQ.empty():
                 try:

@@ -22,7 +22,7 @@ Project delivers MQTT gateway for [EQ-3 Max!](https://max.eq-3.de/login.jsp) hea
 
 ## Configuration
 
-Whole configuration is ocated in config.json file.
+Whole configuration is located in config.json file.
 
 ```json
 {
@@ -49,6 +49,18 @@ config param | meaning
 | max_mqtt_update_interval | Interval of refreshing parameters (even if they not change) in MQTT. In the same time topology of your Max! network is dumped to file topology.json and sanity check is performed.  |
 | max_cube_duty_cycle_reset_interval | Time after duty_cycle counter is reset (since last operation)|
 | max_perform_sanity_check | Enabling sanity check |
+
+##Output data
+Application pushes informations to MQTT broker in following format:
+[mqtt_prefix]/[device_serial_number]/[parameter]
+
+Every change should be published to topic:
+[mqtt_prefix]/[device_serial_number]/[parameter]/set (currently is supported only *target_temperature*)
+
+###Sample data
+
+
+
 
 ##References
 - MaxCube library (little modified) https://github.com/goodfield/python-maxcube-api

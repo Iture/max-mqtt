@@ -152,14 +152,66 @@ class MaxWorker(multiprocessing.Process):
 
     def connect(self):
         if self.__max_cube_connection is None:
-            self.__max_cube_connection = MaxCubeConnection(self.cube_ip_adress, 62910)
-            self.logger.info('Connecting to Max!Cube')
+            try:
+                self.__max_cube_connection = MaxCubeConnection(self.cube_ip_adress, 62910)
+                self.logger.info('Connecting to Max!Cube')
+            except Exception as e:
+                self.logger.error('Problem opening connection')
 
     def close(self):
         if not self.__max_cube_connection is None:
-            self.__max_cube_connection.disconnect()
+            try:
+                self.__max_cube_connection.disconnect()
+            except:
+                self.logger.error('Problem closing connection')
             self.__max_cube_connection = None
             self.logger.debug('Connection to Max!Cube closed')
+
+    def set_temperature(self, cube, device_id, target_temperature):
+        device = self.topology[device_id]
+        self.desired_temperatures[device_id] = float(target_temperature)
+        if float(device['target_temperature']) != float(target_temperature):
+            rf_id = device['rf_address']
+            try:
+                self.logger.debug("Setting temperature for %s  (%s/%s) to:%s" %
+                                  (device_id, device['room_name'], device['name'],
+                                   target_temperature))
+                cube.set_target_temperature(cube.device_by_rf(rf_id), float(target_temperature))
+                self.logger.info("Command result:%s" % (cube.command_result))
+                if cube.command_success:
+                    self.__messageQ.put(self.prepare_output(
+                        'cube', 'free_mem_slots', cube.free_mem_slots))
+                    self.__messageQ.put(self.prepare_output(
+                        'cube', 'duty_cycle', cube.duty_cycle))
+                    self.__messageQ.put(self.prepare_output(
+                        device_id, 'target_temperature', target_temperature))
+            except Exception as ex:
+                self.logger.error("Send error:%s" % (format(ex)))
+        return
+
+    def set_mode(self, cube,device_id, target_mode):
+
+        modes={'AUTO':0, 'MANUAL':1, 'VACATION':2, 'BOOST':3}
+
+        device = self.topology[device_id]
+        if device['mode'] != target_mode:
+            rf_id = device['rf_address']
+            try:
+                self.logger.debug("Setting mode for %s  (%s/%s) to:%s" %
+                                  (device_id, device['room_name'], device['name'],
+                                   target_mode))
+                cube.set_mode(cube.device_by_rf(rf_id), modes[target_mode])
+                self.logger.info("Command result:%s" % (cube.command_result))
+                if cube.command_success:
+                    self.__messageQ.put(self.prepare_output(
+                        'cube', 'free_mem_slots', cube.free_mem_slots))
+                    self.__messageQ.put(self.prepare_output(
+                        'cube', 'duty_cycle', cube.duty_cycle))
+                    self.__messageQ.put(self.prepare_output(
+                        device_id, 'mode', target_mode))
+            except Exception as ex:
+                self.logger.error("Send error:%s" % (format(ex)))
+        return
 
     def run(self):
 
@@ -181,26 +233,10 @@ class MaxWorker(multiprocessing.Process):
                         task = self.__commandQ.get()
                         if task['method'] == 'command':
                             if task['param'] == 'target_temperature':
-                                device = self.topology[task['deviceId']]
-                                self.desired_temperatures[task['deviceId']] = float(task['payload'])
-                                if float(device['target_temperature']) != float(task['payload']):
-                                    rf_id = device['rf_address']
-                                    try:
-                                        self.logger.debug("Setting temperature for %s  (%s/%s) to:%s" %
-                                                          (task['deviceId'], device['room_name'], device['name'],
-                                                           task["payload"]))
-                                        cube.set_target_temperature(cube.device_by_rf(rf_id), float(task['payload']))
-                                        self.logger.info("Command result:%s" % (cube.command_result))
-                                        if cube.command_success:
-                                            self.__messageQ.put(self.prepare_output(
-                                                'cube', 'free_mem_slots', cube.free_mem_slots))
-                                            self.__messageQ.put(self.prepare_output(
-                                                'cube', 'duty_cycle', cube.duty_cycle))
-                                            self.__messageQ.put(self.prepare_output(
-                                                task['deviceId'], 'target_temperature', task['payload']))
-                                    except Exception as ex:
-                                        self.logger.error("Send error:%s" % (format(ex)))
-                            self.logger.debug("Executing command:" % (task))
+                                self.set_temperature(cube,task['deviceId'],task['payload'])
+                            elif task['param'] == 'mode':
+                                self.set_mode(cube,task['deviceId'],task['payload'])
+                            self.logger.debug("Executing command:%s" % (task))
                 except Exception as e:
                     self.logger.error(format(e))
 

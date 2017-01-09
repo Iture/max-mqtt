@@ -210,6 +210,7 @@ class MaxCube(MaxDevice):
         thermostat.target_temperature = int(temperature * 2) / 2.0
 
     def set_mode(self, thermostat, mode):
+        mode = int(mode)
         logger.debug('Setting temperature for %s to %s!' % (thermostat.rf_address, mode))
         rf_address = thermostat.rf_address
         room = str(thermostat.room_id)

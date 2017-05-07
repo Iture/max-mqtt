@@ -2,13 +2,13 @@
 
 Project delivers MQTT gateway for [EQ-3 Max!](https://max.eq-3.de/login.jsp) heating control system.
 
-###Supported Max! components:
+##Supported Max! components:
 - LAN Gateway
 - wall thermostat
 - radiator thermostat
 
 
-###Current features:
+##Current features:
 - reporting parameters from components:
     - mode
     - target temperature

@@ -18,7 +18,7 @@ class MQTTClient(multiprocessing.Process):
         self.mqttDataPrefix = config['mqtt_prefix']
         self.mqtt_host = config['mqtt_host']
         self.mqtt_port = config['mqtt_port']
-        self._mqttConn = mqtt.Client(client_id='Max!-MQTT_'
+        self._mqttConn = mqtt.Client(client_id='Max!-MQTT'
                                                '', clean_session=True, userdata=None)
 
         self._mqttConn.connect(self.mqtt_host, port=self.mqtt_port, keepalive=120)

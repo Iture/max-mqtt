@@ -54,6 +54,9 @@ class MQTTClient(multiprocessing.Process):
             'timestamp': time.time()
         }
         self.commandQ.put(data_out)
+        if message.retain != 0:
+            (rc, final_mid) = self._mqttConn.publish(message.topic, None, 1, True)
+            self.logger.info("Clearing topic " + message.topic)
 
     def publish(self, task):
         if task['timestamp'] <= time.time() + self.message_timeout:

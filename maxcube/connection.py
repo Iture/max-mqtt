@@ -13,11 +13,8 @@ class MaxCubeConnection(object):
 
     def connect(self):
         logger.debug('Connecting to Max! Cube at ' + self.host + ':' + str(self.port))
-        try:
-            if self.socket:
-                self.disconnect()
-        except:
-            logger.debug('Tried disconnecting from cube, caught Exception probably due to stale connection.')
+
+        self.disconnect()
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2)
@@ -41,13 +38,15 @@ class MaxCubeConnection(object):
     def send(self, command):
         try:
             self.socket.send(command.encode('utf-8'))
-        except:
-            self.connect()
-            self.socket.send(command.encode('utf-8'))
-        self.read()
+            self.read()
+        except Exception as e:
+            logger.error('Problem during send: %s' % e)
 
     def disconnect(self):
         if self.socket:
-            self.send('q:\r\n')
-            self.socket.close()
-        self.socket = None
+            try:
+                self.send('q:\r\n')
+                self.socket.close()
+            except:
+                logger.debug('Tried disconnecting from cube, caught Exception probably due to stale connection.')
+            self.socket = None

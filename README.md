@@ -16,7 +16,7 @@ Project delivers MQTT gateway for [EQ-3 Max!](https://max.eq-3.de/login.jsp) hea
     - valve position (for thermostats)
     - battery and link status
     - duty cycle and free memory slots for cube
-- setting target temperature and mode
+- setting target temperature
 - maintaning set temperature (sometimes system behaves strangely, and set temperatures on its own, application can reset it to default values)
 
 
@@ -55,7 +55,7 @@ Application pushes informations to MQTT broker in following format:
 [mqtt_prefix]/[device_serial_number]/[parameter]
 
 Every change should be published to topic:
-[mqtt_prefix]/[device_serial_number]/[parameter]/set (currently are supported only *target_temperature* and *mode*)
+[mqtt_prefix]/[device_serial_number]/[parameter]/set (currently is supported only *target_temperature*)
 
 ###Sample data
 
